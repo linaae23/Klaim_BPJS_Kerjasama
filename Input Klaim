@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Klaim RS - BPJS & Perusahaan</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
+
+  <!-- Header & Konfigurasi Supabase -->
+  <header class="bg-blue-700 text-white shadow-md p-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <h1 class="text-2xl font-bold">Sistem Manajemen Klaim RS</h1>
+      <div class="flex gap-2 w-full md:w-auto">
+        <input id="supabaseUrl" type="text" placeholder="Supabase URL" class="px-3 py-1 text-sm text-gray-900 rounded border border-gray-300 w-full md:w-64">
+        <input id="supabaseKey" type="password" placeholder="Supabase Anon Key" class="px-3 py-1 text-sm text-gray-900 rounded border border-gray-300 w-full md:w-64">
+        <button onclick="initSupabase()" class="bg-green-600 hover:bg-green-700 px-4 py-1 rounded text-sm font-semibold transition">Hubungkan</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-4 md:p-6">
+    
+    <!-- Tab Navigation -->
+    <div class="flex border-b border-gray-300 mb-6 bg-white rounded-t-lg overflow-hidden shadow-sm">
+      <button id="tabBpjsBtn" onclick="switchTab('bpjs')" class="flex-1 py-3 px-6 text-center font-semibold border-b-2 border-blue-600 text-blue-600 bg-blue-50 transition">
+        Klaim BPJS Kesehatan
+      </button>
+      <button id="tabPerusahaanBtn" onclick="switchTab('perusahaan')" class="flex-1 py-3 px-6 text-center font-semibold border-b-2 border-transparent text-gray-500 hover:text-blue-600 transition">
+        Klaim Perusahaan / Asuransi
+      </button>
+    </div>
+
+    <!-- Status Alert -->
+    <div id="statusAlert" class="hidden mb-4 p-4 rounded-lg text-sm font-medium"></div>
+
+    <!-- ================= KLAIM BPJS SECTION ================= -->
+    <section id="sectionBpjs" class="space-y-6">
+      
+      <!-- Form Input BPJS -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Input Data Klaim BPJS</h2>
+        <form id="formBpjs" onsubmit="handleBpjsSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tahun Pelayanan *</label>
+            <input type="number" name="tahun_pelayanan" required class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Bulan Pelayanan (1-12) *</label>
+            <input type="number" min="1" max="12" name="bulan_pelayanan" required class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Kategori Pelayanan *</label>
+            <select name="kategori_pelayanan" required class="w-full border rounded p-2 text-sm">
+              <option value="Utama">Utama</option>
+              <option value="Susulan">Susulan</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Jenis Pelayanan *</label>
+            <select name="jenis_pelayanan" required class="w-full border rounded p-2 text-sm">
+              <option value="Rawat Inap">Rawat Inap</option>
+              <option value="Rawat Jalan">Rawat Jalan</option>
+              <option value="Obat Rawat Inap">Obat Rawat Inap</option>
+              <option value="Obat Rawat Jalan">Obat Rawat Jalan</option>
+              <option value="Alkes">Alkes</option>
+              <option value="CAPD">CAPD</option>
+              <option value="Darah">Darah</option>
+              <option value="IHK">IHK</option>
+              <option value="EGFR">EGFR</option>
+              <option value="Alteplase">Alteplase</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Pengajuan</label>
+            <input type="date" name="tanggal_pengajuan" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">No. BA Pengajuan</label>
+            <input type="text" name="nomor_ba_pengajuan" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Kasus Pengajuan</label>
+            <input type="number" name="kasus_pengajuan" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Pengajuan (Rp)</label>
+            <input type="number" step="0.01" name="nominal_pengajuan" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Biaya Rumah Sakit (Rp)</label>
+            <input type="number" step="0.01" name="biaya_rumah_sakit" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Verifikasi</label>
+            <input type="date" name="tanggal_verifikasi" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">No. BA Verifikasi</label>
+            <input type="text" name="nomor_ba_verifikasi" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Kasus Layak</label>
+            <input type="number" name="kasus_layak" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Layak (Rp)</label>
+            <input type="number" step="0.01" name="nominal_layak" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Pembayaran</label>
+            <input type="date" name="tanggal_pembayaran" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Pembayaran (Rp)</label>
+            <input type="number" step="0.01" name="nominal_pembayaran" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Kasus Pending</label>
+            <input type="number" name="kasus_pending" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Pending (Rp)</label>
+            <input type="number" step="0.01" name="nominal_pending" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Kasus Tidak Layak</label>
+            <input type="number" name="kasus_tidak_layak" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Tidak Layak (Rp)</label>
+            <input type="number" step="0.01" name="nominal_tidak_layak" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Link Dokumen (URL)</label>
+            <input type="url" name="link_dokumen" placeholder="https://..." class="w-full border rounded p-2 text-sm">
+          </div>
+
+          <div class="md:col-span-3 flex justify-end mt-2">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition">Simpan Data BPJS</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabel Data BPJS -->
+      <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
+        <h2 class="text-lg font-bold text-gray-700 mb-4">Daftar Klaim BPJS</h2>
+        <table class="w-full text-xs text-left text-gray-600 border-collapse">
+          <thead class="bg-gray-100 uppercase text-gray-700 font-bold border-b">
+            <tr>
+              <th class="p-2 border">Periode</th>
+              <th class="p-2 border">Kategori / Jenis</th>
+              <th class="p-2 border">BA Pengajuan</th>
+              <th class="p-2 border">Nominal Pengajuan</th>
+              <th class="p-2 border">Nominal Layak</th>
+              <th class="p-2 border">Nominal Pembayaran</th>
+              <th class="p-2 border">Saldo</th>
+              <th class="p-2 border">Dokumen</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyBpjs">
+            <tr><td colspan="8" class="text-center p-4">Belum ada data / Supabase belum terhubung</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= KLAIM PERUSAHAAN SECTION ================= -->
+    <section id="sectionPerusahaan" class="space-y-6 hidden">
+      
+      <!-- Form Input Perusahaan -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Input Data Klaim Perusahaan</h2>
+        <form id="formPerusahaan" onsubmit="handlePerusahaanSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Perusahaan *</label>
+            <input type="text" name="nama_perusahaan" required class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tahun Pelayanan *</label>
+            <input type="number" name="tahun_pelayanan" required class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Bulan Pelayanan (1-12) *</label>
+            <input type="number" min="1" max="12" name="bulan_pelayanan" required class="w-full border rounded p-2 text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Surat</label>
+            <input type="date" name="tanggal_surat" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nomor Surat</label>
+            <input type="text" name="nomor_surat" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Jenis Pelayanan *</label>
+            <select name="jenis_pelayanan" required class="w-full border rounded p-2 text-sm">
+              <option value="Rawat Inap">Rawat Inap</option>
+              <option value="Rawat Jalan">Rawat Jalan</option>
+              <option value="Rawat Inap dan Rawat Jalan">Rawat Inap dan Rawat Jalan</option>
+              <option value="Laboratorium PK">Laboratorium PK</option>
+              <option value="Laboratorium PA">Laboratorium PA</option>
+              <option value="Laboratorium Mikrobiologi">Laboratorium Mikrobiologi</option>
+              <option value="Radiologi">Radiologi</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nomor Tagihan</label>
+            <input type="text" name="nomor_tagihan" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Jumlah Pasien</label>
+            <input type="number" name="jumlah_pasien" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Tagihan (Rp)</label>
+            <input type="number" step="0.01" name="nominal_tagihan" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Pasien</label>
+            <input type="text" name="nama_pasien" placeholder="Dapat diisi beberapa nama..." class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Pembayaran</label>
+            <input type="date" name="tanggal_pembayaran" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Pembayaran (Rp)</label>
+            <input type="number" step="0.01" name="nominal_pembayaran" value="0" class="w-full border rounded p-2 text-sm">
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Link Dokumen (URL)</label>
+            <input type="url" name="link_dokumen" placeholder="https://..." class="w-full border rounded p-2 text-sm">
+          </div>
+
+          <div class="md:col-span-3 flex justify-end mt-2">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition">Simpan Data Perusahaan</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabel Data Perusahaan -->
+      <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
+        <h2 class="text-lg font-bold text-gray-700 mb-4">Daftar Klaim Perusahaan</h2>
+        <table class="w-full text-xs text-left text-gray-600 border-collapse">
+          <thead class="bg-gray-100 uppercase text-gray-700 font-bold border-b">
+            <tr>
+              <th class="p-2 border">Perusahaan</th>
+              <th class="p-2 border">Periode</th>
+              <th class="p-2 border">No. Tagihan / Jenis</th>
+              <th class="p-2 border">Jml Pasien</th>
+              <th class="p-2 border">Nominal Tagihan</th>
+              <th class="p-2 border">Nominal Pembayaran</th>
+              <th class="p-2 border">Saldo</th>
+              <th class="p-2 border">Dokumen</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPerusahaan">
+            <tr><td colspan="8" class="text-center p-4">Belum ada data / Supabase belum terhubung</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let supabaseClient = null;
+
+    // Load saved credentials from localStorage if available
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUrl = localStorage.getItem('sp_url');
+      const savedKey = localStorage.getItem('sp_key');
+      if (savedUrl && savedKey) {
+        document.getElementById('supabaseUrl').value = savedUrl;
+        document.getElementById('supabaseKey').value = savedKey;
+        initSupabase();
+      }
+    });
+
+    function initSupabase() {
+      const url = document.getElementById('supabaseUrl').value.trim();
+      const key = document.getElementById('supabaseKey').value.trim();
+
+      if (!url || !key) {
+        showAlert('Masukkan Supabase URL dan Anon Key terlebih dahulu!', 'bg-red-100 text-red-700');
+        return;
+      }
+
+      try {
+        supabaseClient = supabase.createClient(url, key);
+        localStorage.setItem('sp_url', url);
+        localStorage.setItem('sp_key', key);
+        showAlert('Berhasil terhubung ke Supabase!', 'bg-green-100 text-green-700');
+        fetchBpjsData();
+        fetchPerusahaanData();
+      } catch (err) {
+        showAlert('Gagal terhubung ke Supabase: ' + err.message, 'bg-red-100 text-red-700');
+      }
+    }
+
+    function switchTab(tab) {
+      const bpjsSec = document.getElementById('sectionBpjs');
+      const perusahaanSec = document.getElementById('sectionPerusahaan');
+      const bpjsBtn = document.getElementById('tabBpjsBtn');
+      const perusahaanBtn = document.getElementById('tabPerusahaanBtn');
+
+      if (tab === 'bpjs') {
+        bpjsSec.classList.remove('hidden');
+        perusahaanSec.classList.add('hidden');
+        bpjsBtn.className = 'flex-1 py-3 px-6 text-center font-semibold border-b-2 border-blue-600 text-blue-600 bg-blue-50 transition';
+        perusahaanBtn.className = 'flex-1 py-3 px-6 text-center font-semibold border-b-2 border-transparent text-gray-500 hover:text-blue-600 transition';
+      } else {
+        bpjsSec.classList.add('hidden');
+        perusahaanSec.classList.remove('hidden');
+        perusahaanBtn.className = 'flex-1 py-3 px-6 text-center font-semibold border-b-2 border-blue-600 text-blue-600 bg-blue-50 transition';
+        bpjsBtn.className = 'flex-1 py-3 px-6 text-center font-semibold border-b-2 border-transparent text-gray-500 hover:text-blue-600 transition';
+      }
+    }
+
+    function formatRupiah(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(num || 0);
+    }
+
+    function showAlert(msg, colorClass) {
+      const alert = document.getElementById('statusAlert');
+      alert.className = `mb-4 p-4 rounded-lg text-sm font-medium ${colorClass}`;
+      alert.innerText = msg;
+      alert.classList.remove('hidden');
+      setTimeout(() => alert.classList.add('hidden'), 4000);
+    }
+
+    // --- LOGIK KLAIM BPJS ---
+    async function fetchBpjsData() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient.from('klaim_bpjs').select('*').order('created_at', { ascending: false });
+      const tbody = document.getElementById('tbodyBpjs');
+      
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-red-500">Error: ${error.message}</td></tr>`;
+        return;
+      }
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4">Tidak ada data klaim BPJS</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr class="hover:bg-gray-50 border-b">
+          <td class="p-2 border">${item.bulan_pelayanan}/${item.tahun_pelayanan}</td>
+          <td class="p-2 border"><span class="font-semibold">${item.kategori_pelayanan}</span> - ${item.jenis_pelayanan}</td>
+          <td class="p-2 border">${item.nomor_ba_pengajuan || '-'}</td>
+          <td class="p-2 border">${formatRupiah(item.nominal_pengajuan)}</td>
+          <td class="p-2 border">${formatRupiah(item.nominal_layak)}</td>
+          <td class="p-2 border">${formatRupiah(item.nominal_pembayaran)}</td>
+          <td class="p-2 border font-semibold text-blue-600">${formatRupiah(item.saldo)}</td>
+          <td class="p-2 border">${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-500 underline">Lihat</a>` : '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function handleBpjsSubmit(e) {
+      e.preventDefault();
+      if (!supabaseClient) return alert('Hubungkan ke Supabase terlebih dahulu!');
+
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+      
+      // Clean up empty optional date/string fields
+      ['tanggal_pengajuan', 'tanggal_verifikasi', 'tanggal_pembayaran', 'nomor_ba_pengajuan', 'nomor_ba_verifikasi', 'link_dokumen'].forEach(key => {
+        if (!payload[key]) delete payload[key];
+      });
+
+      const { error } = await supabaseClient.from('klaim_bpjs').insert([payload]);
+      if (error) {
+        showAlert('Gagal menyimpan: ' + error.message, 'bg-red-100 text-red-700');
+      } else {
+        showAlert('Data Klaim BPJS berhasil disimpan!', 'bg-green-100 text-green-700');
+        e.target.reset();
+        fetchBpjsData();
+      }
+    }
+
+    // --- LOGIK KLAIM PERUSAHAAN ---
+    async function fetchPerusahaanData() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient.from('klaim_perusahaan').select('*').order('created_at', { ascending: false });
+      const tbody = document.getElementById('tbodyPerusahaan');
+
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-red-500">Error: ${error.message}</td></tr>`;
+        return;
+      }
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4">Tidak ada data klaim Perusahaan</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr class="hover:bg-gray-50 border-b">
+          <td class="p-2 border font-semibold">${item.nama_perusahaan}</td>
+          <td class="p-2 border">${item.bulan_pelayanan}/${item.tahun_pelayanan}</td>
+          <td class="p-2 border">${item.nomor_tagihan || '-'}<br><span class="text-gray-400">${item.jenis_pelayanan}</span></td>
+          <td class="p-2 border text-center">${item.jumlah_pasien}</td>
+          <td class="p-2 border">${formatRupiah(item.nominal_tagihan)}</td>
+          <td class="p-2 border">${formatRupiah(item.nominal_pembayaran)}</td>
+          <td class="p-2 border font-semibold text-blue-600">${formatRupiah(item.saldo)}</td>
+          <td class="p-2 border">${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-500 underline">Lihat</a>` : '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function handlePerusahaanSubmit(e) {
+      e.preventDefault();
+      if (!supabaseClient) return alert('Hubungkan ke Supabase terlebih dahulu!');
+
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      ['tanggal_surat', 'tanggal_pembayaran', 'nomor_surat', 'nomor_tagihan', 'nama_pasien', 'link_dokumen'].forEach(key => {
+        if (!payload[key]) delete payload[key];
+      });
+
+      const { error } = await supabaseClient.from('klaim_perusahaan').insert([payload]);
+      if (error) {
+        showAlert('Gagal menyimpan: ' + error.message, 'bg-red-100 text-red-700');
+      } else {
+        showAlert('Data Klaim Perusahaan berhasil disimpan!', 'bg-green-100 text-green-700');
+        e.target.reset();
+        fetchPerusahaanData();
+      }
+    }
+  </script>
+</body>
+</html>
