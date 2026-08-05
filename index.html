@@ -46,8 +46,13 @@
       
       <!-- Form Input BPJS -->
       <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Input Data Klaim BPJS</h2>
+        <div class="flex justify-between items-center border-b pb-2 mb-4">
+          <h2 id="formBpjsTitle" class="text-lg font-bold text-gray-700">Input Data Klaim BPJS</h2>
+          <button id="btnBpjsCancel" onclick="cancelBpjsEdit()" class="hidden bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition">Batal Edit</button>
+        </div>
+
         <form id="formBpjs" onsubmit="handleBpjsSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input type="hidden" name="id" id="bpjsId">
           
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Tahun Pelayanan *</label>
@@ -161,8 +166,8 @@
             <input type="url" name="link_dokumen" placeholder="https://..." class="w-full border rounded p-2 text-sm">
           </div>
 
-          <div class="md:col-span-3 flex justify-end mt-2">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition">Simpan Data BPJS</button>
+          <div class="md:col-span-3 flex justify-end gap-2 mt-2">
+            <button type="submit" id="btnBpjsSubmit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition">Simpan Data BPJS</button>
           </div>
         </form>
       </div>
@@ -181,10 +186,11 @@
               <th class="p-2 border">Nominal Pembayaran</th>
               <th class="p-2 border">Saldo</th>
               <th class="p-2 border">Dokumen</th>
+              <th class="p-2 border text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbodyBpjs">
-            <tr><td colspan="8" class="text-center p-4">Sedang memuat data...</td></tr>
+            <tr><td colspan="9" class="text-center p-4">Sedang memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -195,8 +201,13 @@
       
       <!-- Form Input Perusahaan -->
       <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Input Data Klaim Perusahaan</h2>
+        <div class="flex justify-between items-center border-b pb-2 mb-4">
+          <h2 id="formPerusahaanTitle" class="text-lg font-bold text-gray-700">Input Data Klaim Perusahaan</h2>
+          <button id="btnPerusahaanCancel" onclick="cancelPerusahaanEdit()" class="hidden bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition">Batal Edit</button>
+        </div>
+
         <form id="formPerusahaan" onsubmit="handlePerusahaanSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input type="hidden" name="id" id="perusahaanId">
           
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Perusahaan *</label>
@@ -277,8 +288,8 @@
             <input type="url" name="link_dokumen" placeholder="https://..." class="w-full border rounded p-2 text-sm">
           </div>
 
-          <div class="md:col-span-3 flex justify-end mt-2">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition">Simpan Data Perusahaan</button>
+          <div class="md:col-span-3 flex justify-end gap-2 mt-2">
+            <button type="submit" id="btnPerusahaanSubmit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition">Simpan Data Perusahaan</button>
           </div>
         </form>
       </div>
@@ -297,10 +308,11 @@
               <th class="p-2 border">Nominal Pembayaran</th>
               <th class="p-2 border">Saldo</th>
               <th class="p-2 border">Dokumen</th>
+              <th class="p-2 border text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbodyPerusahaan">
-            <tr><td colspan="8" class="text-center p-4">Sedang memuat data...</td></tr>
+            <tr><td colspan="9" class="text-center p-4">Sedang memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -316,17 +328,17 @@
           <button onclick="resetLaporanFilter()" class="text-xs text-blue-600 hover:underline">Reset Filter</button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           
           <!-- Filter Tahun & Bulan -->
           <div class="space-y-3">
             <div>
               <label class="block text-xs font-bold text-gray-700 mb-1">Tahun Klaim</label>
-              <input type="number" id="filterTahun" placeholder="Semua Tahun (atau ketik tahun)" oninput="applyLaporanFilter()" class="w-full border rounded p-2 text-sm">
+              <input type="number" id="filterTahun" placeholder="Semua Tahun" oninput="applyLaporanFilter()" class="w-full border rounded p-2 text-sm">
             </div>
             
             <div>
-              <label class="block text-xs font-bold text-gray-700 mb-1">Bulan Klaim (Bisa Pilih Banyak)</label>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Bulan Klaim</label>
               <div class="grid grid-cols-3 gap-1 text-xs border p-2 rounded h-28 overflow-y-auto bg-gray-50">
                 <label class="flex items-center gap-1"><input type="checkbox" class="filter-bulan" value="1" onchange="applyLaporanFilter()"> Jan</label>
                 <label class="flex items-center gap-1"><input type="checkbox" class="filter-bulan" value="2" onchange="applyLaporanFilter()"> Feb</label>
@@ -344,9 +356,19 @@
             </div>
           </div>
 
+          <!-- Filter Kategori Pelayanan -->
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Kategori Pelayanan</label>
+            <div class="space-y-2 border p-3 rounded h-40 bg-gray-50 text-xs">
+              <label class="flex items-center gap-2 font-medium"><input type="checkbox" class="filter-kategori" value="Utama" checked onchange="applyLaporanFilter()"> Utama</label>
+              <label class="flex items-center gap-2 font-medium"><input type="checkbox" class="filter-kategori" value="Susulan" checked onchange="applyLaporanFilter()"> Susulan</label>
+              <p class="text-[10px] text-gray-500 mt-2 italic">*Jika keduanya dicentang pada bulan yang sama, saldo pengajuan memakai Utama, nilai layak & tdk layak dijumlah, dan nilai pending memakai susulan terakhir.</p>
+            </div>
+          </div>
+
           <!-- Filter Jenis Pelayanan -->
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Pelayanan (Bisa Pilih Banyak)</label>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Pelayanan</label>
             <div class="space-y-1 text-xs border p-2 rounded h-40 overflow-y-auto bg-gray-50">
               <label class="flex items-center gap-2"><input type="checkbox" class="filter-jenis" value="Rawat Inap" onchange="applyLaporanFilter()"> Rawat Inap</label>
               <label class="flex items-center gap-2"><input type="checkbox" class="filter-jenis" value="Rawat Jalan" onchange="applyLaporanFilter()"> Rawat Jalan</label>
@@ -363,12 +385,12 @@
 
           <!-- Filter Tampilan Kolom Status -->
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Filter Opsi Tampilan Status</label>
-            <div class="space-y-2 border p-3 rounded bg-gray-50 text-xs">
-              <label class="flex items-center gap-2 font-medium text-blue-700"><input type="checkbox" class="filter-status" value="pengajuan" checked onchange="toggleLaporanColumns()"> Tampilkan Nominal Pengajuan</label>
-              <label class="flex items-center gap-2 font-medium text-green-700"><input type="checkbox" class="filter-status" value="layak" checked onchange="toggleLaporanColumns()"> Tampilkan Nominal Layak</label>
-              <label class="flex items-center gap-2 font-medium text-yellow-700"><input type="checkbox" class="filter-status" value="pending" checked onchange="toggleLaporanColumns()"> Tampilkan Nominal Pending</label>
-              <label class="flex items-center gap-2 font-medium text-red-700"><input type="checkbox" class="filter-status" value="tidak_layak" checked onchange="toggleLaporanColumns()"> Tampilkan Nominal Tidak Layak</label>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Tampilan Kolom Status</label>
+            <div class="space-y-2 border p-3 rounded h-40 bg-gray-50 text-xs">
+              <label class="flex items-center gap-2 font-medium text-blue-700"><input type="checkbox" class="filter-status" value="pengajuan" checked onchange="toggleLaporanColumns()"> Nominal Pengajuan</label>
+              <label class="flex items-center gap-2 font-medium text-green-700"><input type="checkbox" class="filter-status" value="layak" checked onchange="toggleLaporanColumns()"> Nominal Layak</label>
+              <label class="flex items-center gap-2 font-medium text-amber-700"><input type="checkbox" class="filter-status" value="pending" checked onchange="toggleLaporanColumns()"> Nominal Pending</label>
+              <label class="flex items-center gap-2 font-medium text-red-700"><input type="checkbox" class="filter-status" value="tidak_layak" checked onchange="toggleLaporanColumns()"> Nominal Tidak Layak</label>
             </div>
           </div>
 
@@ -387,21 +409,21 @@
 
         <!-- Card Nilai Layak -->
         <div class="bg-white p-5 rounded-lg shadow border-l-4 border-green-500">
-          <p class="text-xs font-bold text-gray-500 uppercase">Nilai Layak</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Nilai Layak Total</p>
           <h3 id="cardNominalLayak" class="text-lg font-extrabold text-green-600 mt-1">Rp 0</h3>
           <p class="text-xs text-gray-600 mt-2">Total Kasus: <span id="cardKasusLayak" class="font-bold text-gray-800">0</span></p>
         </div>
 
         <!-- Card Nilai Pending -->
         <div class="bg-white p-5 rounded-lg shadow border-l-4 border-amber-500">
-          <p class="text-xs font-bold text-gray-500 uppercase">Nilai Pending</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Nilai Pending Total</p>
           <h3 id="cardNominalPending" class="text-lg font-extrabold text-amber-600 mt-1">Rp 0</h3>
           <p class="text-xs text-gray-600 mt-2">Total Kasus: <span id="cardKasusPending" class="font-bold text-gray-800">0</span></p>
         </div>
 
         <!-- Card Nilai Tidak Layak -->
         <div class="bg-white p-5 rounded-lg shadow border-l-4 border-red-500">
-          <p class="text-xs font-bold text-gray-500 uppercase">Nilai Tidak Layak</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Nilai Tidak Layak Total</p>
           <h3 id="cardNominalTidakLayak" class="text-lg font-extrabold text-red-600 mt-1">Rp 0</h3>
           <p class="text-xs text-gray-600 mt-2">Total Kasus: <span id="cardKasusTidakLayak" class="font-bold text-gray-800">0</span></p>
         </div>
@@ -454,14 +476,14 @@
 
   <script>
     // ================= CONFIG & INIT =================
-    // Isikan URL dan Anon Key Supabase Anda di sini
-    const SUPABASE_URL = "https://xxxxxx.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+    const SUPABASE_URL = "https://nalyzycgxootsioyrfsl.supabase.co/rest/v1/";
+    const SUPABASE_ANON_KEY = "sb_publishable_g0xfBfLedCvBqeRf6D0ecw_PdtwBr1t";
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let rawBpjsData = [];
-    let filteredBpjsData = [];
+    let rawPerusahaanData = [];
+    let aggregatedReportData = [];
 
     window.addEventListener('DOMContentLoaded', () => {
       fetchBpjsData();
@@ -478,7 +500,6 @@
       const perusahaanBtn = document.getElementById('tabPerusahaanBtn');
       const laporanBtn = document.getElementById('tabLaporanBtn');
 
-      // Hide all
       bpjsSec.classList.add('hidden');
       perusahaanSec.classList.add('hidden');
       laporanSec.classList.add('hidden');
@@ -496,7 +517,7 @@
       } else if (tab === 'laporan') {
         laporanSec.classList.remove('hidden');
         laporanBtn.className = 'flex-1 py-3 px-4 text-center font-semibold border-b-2 border-blue-600 text-blue-600 bg-blue-50 transition';
-        applyLaporanFilter(); // Refresh laporan
+        applyLaporanFilter();
       }
     }
 
@@ -518,14 +539,14 @@
       const tbody = document.getElementById('tbodyBpjs');
       
       if (error) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-red-500">Error: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center p-4 text-red-500">Error: ${error.message}</td></tr>`;
         return;
       }
 
       rawBpjsData = data || [];
       
       if (rawBpjsData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4">Tidak ada data klaim BPJS</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center p-4">Tidak ada data klaim BPJS</td></tr>`;
         return;
       }
 
@@ -539,25 +560,80 @@
           <td class="p-2 border">${formatRupiah(item.nominal_pembayaran)}</td>
           <td class="p-2 border font-semibold text-blue-600">${formatRupiah(item.saldo)}</td>
           <td class="p-2 border">${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-500 underline">Lihat</a>` : '-'}</td>
+          <td class="p-2 border text-center">
+            <button onclick="editBpjs('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] px-2 py-1 rounded transition">Edit</button>
+          </td>
         </tr>
       `).join('');
+    }
+
+    function editBpjs(id) {
+      const item = rawBpjsData.find(i => i.id === id);
+      if (!item) return;
+
+      const form = document.getElementById('formBpjs');
+      document.getElementById('bpjsId').value = item.id;
+      
+      form.tahun_pelayanan.value = item.tahun_pelayanan || '';
+      form.bulan_pelayanan.value = item.bulan_pelayanan || '';
+      form.kategori_pelayanan.value = item.kategori_pelayanan || 'Utama';
+      form.jenis_pelayanan.value = item.jenis_pelayanan || 'Rawat Inap';
+      form.tanggal_pengajuan.value = item.tanggal_pengajuan || '';
+      form.nomor_ba_pengajuan.value = item.nomor_ba_pengajuan || '';
+      form.kasus_pengajuan.value = item.kasus_pengajuan || 0;
+      form.nominal_pengajuan.value = item.nominal_pengajuan || 0;
+      form.biaya_rumah_sakit.value = item.biaya_rumah_sakit || 0;
+      form.tanggal_verifikasi.value = item.tanggal_verifikasi || '';
+      form.nomor_ba_verifikasi.value = item.nomor_ba_verifikasi || '';
+      form.kasus_layak.value = item.kasus_layak || 0;
+      form.nominal_layak.value = item.nominal_layak || 0;
+      form.tanggal_pembayaran.value = item.tanggal_pembayaran || '';
+      form.nominal_pembayaran.value = item.nominal_pembayaran || 0;
+      form.kasus_pending.value = item.kasus_pending || 0;
+      form.nominal_pending.value = item.nominal_pending || 0;
+      form.kasus_tidak_layak.value = item.kasus_tidak_layak || 0;
+      form.nominal_tidak_layak.value = item.nominal_tidak_layak || 0;
+      form.link_dokumen.value = item.link_dokumen || '';
+
+      document.getElementById('formBpjsTitle').innerText = 'Edit Data Klaim BPJS';
+      document.getElementById('btnBpjsSubmit').innerText = 'Update Data BPJS';
+      document.getElementById('btnBpjsCancel').classList.remove('hidden');
+      
+      switchTab('bpjs');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelBpjsEdit() {
+      document.getElementById('bpjsId').value = '';
+      document.getElementById('formBpjs').reset();
+      document.getElementById('formBpjsTitle').innerText = 'Input Data Klaim BPJS';
+      document.getElementById('btnBpjsSubmit').innerText = 'Simpan Data BPJS';
+      document.getElementById('btnBpjsCancel').classList.add('hidden');
     }
 
     async function handleBpjsSubmit(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
       const payload = Object.fromEntries(formData.entries());
+      const editId = payload.id;
+      delete payload.id;
 
       ['tanggal_pengajuan', 'tanggal_verifikasi', 'tanggal_pembayaran', 'nomor_ba_pengajuan', 'nomor_ba_verifikasi', 'link_dokumen'].forEach(key => {
         if (!payload[key]) delete payload[key];
       });
 
-      const { error } = await supabaseClient.from('klaim_bpjs').insert([payload]);
+      let error;
+      if (editId) {
+        ({ error } = await supabaseClient.from('klaim_bpjs').update(payload).eq('id', editId));
+      } else {
+        ({ error } = await supabaseClient.from('klaim_bpjs').insert([payload]));
+      }
+
       if (error) {
         showAlert('Gagal menyimpan: ' + error.message, 'bg-red-100 text-red-700');
       } else {
-        showAlert('Data Klaim BPJS berhasil disimpan!', 'bg-green-100 text-green-700');
-        e.target.reset();
+        showAlert(editId ? 'Data Klaim BPJS berhasil diperbarui!' : 'Data Klaim BPJS berhasil disimpan!', 'bg-green-100 text-green-700');
+        cancelBpjsEdit();
         fetchBpjsData();
       }
     }
@@ -568,15 +644,18 @@
       const tbody = document.getElementById('tbodyPerusahaan');
 
       if (error) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-red-500">Error: ${error.message}</td></tr>`;
-        return;
-      }
-      if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4">Tidak ada data klaim Perusahaan</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center p-4 text-red-500">Error: ${error.message}</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = data.map(item => `
+      rawPerusahaanData = data || [];
+
+      if (rawPerusahaanData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center p-4">Tidak ada data klaim Perusahaan</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rawPerusahaanData.map(item => `
         <tr class="hover:bg-gray-50 border-b">
           <td class="p-2 border font-semibold">${item.nama_perusahaan}</td>
           <td class="p-2 border">${item.bulan_pelayanan}/${item.tahun_pelayanan}</td>
@@ -586,25 +665,73 @@
           <td class="p-2 border">${formatRupiah(item.nominal_pembayaran)}</td>
           <td class="p-2 border font-semibold text-blue-600">${formatRupiah(item.saldo)}</td>
           <td class="p-2 border">${item.link_dokumen ? `<a href="${item.link_dokumen}" target="_blank" class="text-blue-500 underline">Lihat</a>` : '-'}</td>
+          <td class="p-2 border text-center">
+            <button onclick="editPerusahaan('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] px-2 py-1 rounded transition">Edit</button>
+          </td>
         </tr>
       `).join('');
+    }
+
+    function editPerusahaan(id) {
+      const item = rawPerusahaanData.find(i => i.id === id);
+      if (!item) return;
+
+      const form = document.getElementById('formPerusahaan');
+      document.getElementById('perusahaanId').value = item.id;
+
+      form.nama_perusahaan.value = item.nama_perusahaan || '';
+      form.tahun_pelayanan.value = item.tahun_pelayanan || '';
+      form.bulan_pelayanan.value = item.bulan_pelayanan || '';
+      form.tanggal_surat.value = item.tanggal_surat || '';
+      form.nomor_surat.value = item.nomor_surat || '';
+      form.jenis_pelayanan.value = item.jenis_pelayanan || 'Rawat Inap';
+      form.nomor_tagihan.value = item.nomor_tagihan || '';
+      form.jumlah_pasien.value = item.jumlah_pasien || 0;
+      form.nominal_tagihan.value = item.nominal_tagihan || 0;
+      form.nama_pasien.value = item.nama_pasien || '';
+      form.tanggal_pembayaran.value = item.tanggal_pembayaran || '';
+      form.nominal_pembayaran.value = item.nominal_pembayaran || 0;
+      form.link_dokumen.value = item.link_dokumen || '';
+
+      document.getElementById('formPerusahaanTitle').innerText = 'Edit Data Klaim Perusahaan';
+      document.getElementById('btnPerusahaanSubmit').innerText = 'Update Data Perusahaan';
+      document.getElementById('btnPerusahaanCancel').classList.remove('hidden');
+
+      switchTab('perusahaan');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelPerusahaanEdit() {
+      document.getElementById('perusahaanId').value = '';
+      document.getElementById('formPerusahaan').reset();
+      document.getElementById('formPerusahaanTitle').innerText = 'Input Data Klaim Perusahaan';
+      document.getElementById('btnPerusahaanSubmit').innerText = 'Simpan Data Perusahaan';
+      document.getElementById('btnPerusahaanCancel').classList.add('hidden');
     }
 
     async function handlePerusahaanSubmit(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
       const payload = Object.fromEntries(formData.entries());
+      const editId = payload.id;
+      delete payload.id;
 
       ['tanggal_surat', 'tanggal_pembayaran', 'nomor_surat', 'nomor_tagihan', 'nama_pasien', 'link_dokumen'].forEach(key => {
         if (!payload[key]) delete payload[key];
       });
 
-      const { error } = await supabaseClient.from('klaim_perusahaan').insert([payload]);
+      let error;
+      if (editId) {
+        ({ error } = await supabaseClient.from('klaim_perusahaan').update(payload).eq('id', editId));
+      } else {
+        ({ error } = await supabaseClient.from('klaim_perusahaan').insert([payload]));
+      }
+
       if (error) {
         showAlert('Gagal menyimpan: ' + error.message, 'bg-red-100 text-red-700');
       } else {
-        showAlert('Data Klaim Perusahaan berhasil disimpan!', 'bg-green-100 text-green-700');
-        e.target.reset();
+        showAlert(editId ? 'Data Klaim Perusahaan berhasil diperbarui!' : 'Data Klaim Perusahaan berhasil disimpan!', 'bg-green-100 text-green-700');
+        cancelPerusahaanEdit();
         fetchPerusahaanData();
       }
     }
@@ -615,16 +742,95 @@
       
       const selectedBulan = Array.from(document.querySelectorAll('.filter-bulan:checked')).map(cb => parseInt(cb.value));
       const selectedJenis = Array.from(document.querySelectorAll('.filter-jenis:checked')).map(cb => cb.value);
+      const selectedKategori = Array.from(document.querySelectorAll('.filter-kategori:checked')).map(cb => cb.value);
 
-      filteredBpjsData = rawBpjsData.filter(item => {
-        // Filter Tahun
+      const isBothKategoriSelected = selectedKategori.includes('Utama') && selectedKategori.includes('Susulan');
+
+      // 1. Filter Raw Data berdasarkan input user
+      const filtered = rawBpjsData.filter(item => {
         if (tahunInput && parseInt(item.tahun_pelayanan) !== parseInt(tahunInput)) return false;
-        // Filter Bulan
         if (selectedBulan.length > 0 && !selectedBulan.includes(parseInt(item.bulan_pelayanan))) return false;
-        // Filter Jenis
         if (selectedJenis.length > 0 && !selectedJenis.includes(item.jenis_pelayanan)) return false;
-
+        if (selectedKategori.length > 0 && !selectedKategori.includes(item.kategori_pelayanan)) return false;
         return true;
+      });
+
+      // 2. Grouping data per (Tahun + Bulan + Jenis Pelayanan)
+      const groups = {};
+      filtered.forEach(item => {
+        const key = `${item.tahun_pelayanan}_${item.bulan_pelayanan}_${item.jenis_pelayanan}`;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(item);
+      });
+
+      // 3. Kalkulasi Logika Khusus per Group
+      aggregatedReportData = Object.keys(groups).map(key => {
+        const items = groups[key];
+        const [tahun, bulan, jenis] = key.split('_');
+
+        const utamaItem = items.find(i => i.kategori_pelayanan === 'Utama');
+        const susulanItems = items.filter(i => i.kategori_pelayanan === 'Susulan');
+
+        let result = {
+          tahun_pelayanan: tahun,
+          bulan_pelayanan: bulan,
+          jenis_pelayanan: jenis,
+          kategori_pelayanan: Array.from(new Set(items.map(i => i.kategori_pelayanan))).join(', '),
+          kasus_pengajuan: 0,
+          nominal_pengajuan: 0,
+          kasus_layak: 0,
+          nominal_layak: 0,
+          kasus_pending: 0,
+          nominal_pending: 0,
+          kasus_tidak_layak: 0,
+          nominal_tidak_layak: 0,
+          nominal_pembayaran: 0,
+          saldo: 0
+        };
+
+        // Jika DUA-DUANYA (Utama & Susulan) dipilih dan ADA pada bulan yang sama
+        if (isBothKategoriSelected && utamaItem && susulanItems.length > 0) {
+          // Rule 1: Saldo/Nominal Pengajuan memakai saldo pengajuan Utama
+          result.kasus_pengajuan = parseInt(utamaItem.kasus_pengajuan || 0);
+          result.nominal_pengajuan = parseFloat(utamaItem.nominal_pengajuan || 0);
+
+          // Rule 2: Nilai Layak memakai JUMLAH layak (Utama + Susulan)
+          result.kasus_layak = items.reduce((sum, i) => sum + (parseInt(i.kasus_layak) || 0), 0);
+          result.nominal_layak = items.reduce((sum, i) => sum + (parseFloat(i.nominal_layak) || 0), 0);
+
+          // Rule 3: Nilai Pending memakai nilai pending TERAKHIR yang muncul di susulan
+          // rawBpjsData diurutkan descending, susulanItems[0] adalah susulan terbaru
+          const latestSusulan = susulanItems[0];
+          result.kasus_pending = parseInt(latestSusulan.kasus_pending || 0);
+          result.nominal_pending = parseFloat(latestSusulan.nominal_pending || 0);
+
+          // Rule 4: Nilai Tidak Layak memakai JUMLAH tidak layak (Utama + Susulan)
+          result.kasus_tidak_layak = items.reduce((sum, i) => sum + (parseInt(i.kasus_tidak_layak) || 0), 0);
+          result.nominal_tidak_layak = items.reduce((sum, i) => sum + (parseFloat(i.nominal_tidak_layak) || 0), 0);
+
+          // Pembayaran & Saldo
+          result.nominal_pembayaran = items.reduce((sum, i) => sum + (parseFloat(i.nominal_pembayaran) || 0), 0);
+          result.saldo = result.nominal_pengajuan - result.nominal_pembayaran;
+
+        } else {
+          // Kalkulasi Standar jika hanya memilih salah satu atau kelompok tunggal
+          result.kasus_pengajuan = items.reduce((sum, i) => sum + (parseInt(i.kasus_pengajuan) || 0), 0);
+          result.nominal_pengajuan = items.reduce((sum, i) => sum + (parseFloat(i.nominal_pengajuan) || 0), 0);
+
+          result.kasus_layak = items.reduce((sum, i) => sum + (parseInt(i.kasus_layak) || 0), 0);
+          result.nominal_layak = items.reduce((sum, i) => sum + (parseFloat(i.nominal_layak) || 0), 0);
+
+          result.kasus_pending = items.reduce((sum, i) => sum + (parseInt(i.kasus_pending) || 0), 0);
+          result.nominal_pending = items.reduce((sum, i) => sum + (parseFloat(i.nominal_pending) || 0), 0);
+
+          result.kasus_tidak_layak = items.reduce((sum, i) => sum + (parseInt(i.kasus_tidak_layak) || 0), 0);
+          result.nominal_tidak_layak = items.reduce((sum, i) => sum + (parseFloat(i.nominal_tidak_layak) || 0), 0);
+
+          result.nominal_pembayaran = items.reduce((sum, i) => sum + (parseFloat(i.nominal_pembayaran) || 0), 0);
+          result.saldo = result.nominal_pengajuan - result.nominal_pembayaran;
+        }
+
+        return result;
       });
 
       updateDashboardCards();
@@ -636,6 +842,7 @@
       document.getElementById('filterTahun').value = '';
       document.querySelectorAll('.filter-bulan').forEach(cb => cb.checked = false);
       document.querySelectorAll('.filter-jenis').forEach(cb => cb.checked = false);
+      document.querySelectorAll('.filter-kategori').forEach(cb => cb.checked = true);
       document.querySelectorAll('.filter-status').forEach(cb => cb.checked = true);
       applyLaporanFilter();
     }
@@ -646,18 +853,18 @@
       let kPending = 0, nPending = 0;
       let kTidakLayak = 0, nTidakLayak = 0;
 
-      filteredBpjsData.forEach(item => {
-        kPengajuan += (item.kasus_pengajuan || 0);
-        nPengajuan += parseFloat(item.nominal_pengajuan || 0);
+      aggregatedReportData.forEach(item => {
+        kPengajuan += item.kasus_pengajuan;
+        nPengajuan += item.nominal_pengajuan;
 
-        kLayak += (item.kasus_layak || 0);
-        nLayak += parseFloat(item.nominal_layak || 0);
+        kLayak += item.kasus_layak;
+        nLayak += item.nominal_layak;
 
-        kPending += (item.kasus_pending || 0);
-        nPending += parseFloat(item.nominal_pending || 0);
+        kPending += item.kasus_pending;
+        nPending += item.nominal_pending;
 
-        kTidakLayak += (item.kasus_tidak_layak || 0);
-        nTidakLayak += parseFloat(item.nominal_tidak_layak || 0);
+        kTidakLayak += item.kasus_tidak_layak;
+        nTidakLayak += item.nominal_tidak_layak;
       });
 
       document.getElementById('cardKasusPengajuan').innerText = kPengajuan.toLocaleString('id-ID');
@@ -676,26 +883,26 @@
     function renderTabelLaporan() {
       const tbody = document.getElementById('tbodyLaporanBpjs');
 
-      if (filteredBpjsData.length === 0) {
+      if (aggregatedReportData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="12" class="text-center p-4">Tidak ada data sesuai filter</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = filteredBpjsData.map(item => `
+      tbody.innerHTML = aggregatedReportData.map(item => `
         <tr class="hover:bg-gray-50 border-b">
           <td class="p-2 border">${item.bulan_pelayanan}/${item.tahun_pelayanan}</td>
           <td class="p-2 border"><span class="font-semibold">${item.kategori_pelayanan}</span> - ${item.jenis_pelayanan}</td>
           
-          <td class="p-2 border text-center col-pengajuan">${item.kasus_pengajuan || 0}</td>
+          <td class="p-2 border text-center col-pengajuan">${item.kasus_pengajuan}</td>
           <td class="p-2 border col-pengajuan">${formatRupiah(item.nominal_pengajuan)}</td>
 
-          <td class="p-2 border text-center col-layak">${item.kasus_layak || 0}</td>
+          <td class="p-2 border text-center col-layak">${item.kasus_layak}</td>
           <td class="p-2 border col-layak">${formatRupiah(item.nominal_layak)}</td>
 
-          <td class="p-2 border text-center col-pending">${item.kasus_pending || 0}</td>
+          <td class="p-2 border text-center col-pending">${item.kasus_pending}</td>
           <td class="p-2 border col-pending">${formatRupiah(item.nominal_pending)}</td>
 
-          <td class="p-2 border text-center col-tidak_layak">${item.kasus_tidak_layak || 0}</td>
+          <td class="p-2 border text-center col-tidak_layak">${item.kasus_tidak_layak}</td>
           <td class="p-2 border col-tidak_layak">${formatRupiah(item.nominal_tidak_layak)}</td>
 
           <td class="p-2 border">${formatRupiah(item.nominal_pembayaran)}</td>
@@ -720,17 +927,17 @@
 
     // 1. Download CSV
     function downloadCSV() {
-      if (filteredBpjsData.length === 0) return alert('Tidak ada data untuk di-download');
+      if (aggregatedReportData.length === 0) return alert('Tidak ada data untuk di-download');
 
       const headers = ["Tahun", "Bulan", "Kategori", "Jenis", "Kasus Pengajuan", "Nominal Pengajuan", "Kasus Layak", "Nominal Layak", "Kasus Pending", "Nominal Pending", "Kasus Tidak Layak", "Nominal Tidak Layak", "Nominal Pembayaran", "Saldo"];
       
-      const rows = filteredBpjsData.map(i => [
-        i.tahun_pelayanan, i.bulan_pelayanan, i.kategori_pelayanan, i.jenis_pelayanan,
-        i.kasus_pengajuan || 0, i.nominal_pengajuan || 0,
-        i.kasus_layak || 0, i.nominal_layak || 0,
-        i.kasus_pending || 0, i.nominal_pending || 0,
-        i.kasus_tidak_layak || 0, i.nominal_tidak_layak || 0,
-        i.nominal_pembayaran || 0, i.saldo || 0
+      const rows = aggregatedReportData.map(i => [
+        i.tahun_pelayanan, i.bulan_pelayanan, `"${i.kategori_pelayanan}"`, `"${i.jenis_pelayanan}"`,
+        i.kasus_pengajuan, i.nominal_pengajuan,
+        i.kasus_layak, i.nominal_layak,
+        i.kasus_pending, i.nominal_pending,
+        i.kasus_tidak_layak, i.nominal_tidak_layak,
+        i.nominal_pembayaran, i.saldo
       ]);
 
       let csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
@@ -745,23 +952,23 @@
 
     // 2. Download Excel (.xlsx)
     function downloadExcel() {
-      if (filteredBpjsData.length === 0) return alert('Tidak ada data untuk di-download');
+      if (aggregatedReportData.length === 0) return alert('Tidak ada data untuk di-download');
 
-      const dataToExport = filteredBpjsData.map(i => ({
+      const dataToExport = aggregatedReportData.map(i => ({
         "Tahun Pelayanan": i.tahun_pelayanan,
         "Bulan Pelayanan": i.bulan_pelayanan,
         "Kategori": i.kategori_pelayanan,
         "Jenis Pelayanan": i.jenis_pelayanan,
-        "Kasus Pengajuan": i.kasus_pengajuan || 0,
-        "Nominal Pengajuan (Rp)": i.nominal_pengajuan || 0,
-        "Kasus Layak": i.kasus_layak || 0,
-        "Nominal Layak (Rp)": i.nominal_layak || 0,
-        "Kasus Pending": i.kasus_pending || 0,
-        "Nominal Pending (Rp)": i.nominal_pending || 0,
-        "Kasus Tidak Layak": i.kasus_tidak_layak || 0,
-        "Nominal Tidak Layak (Rp)": i.nominal_tidak_layak || 0,
-        "Nominal Pembayaran (Rp)": i.nominal_pembayaran || 0,
-        "Saldo (Rp)": i.saldo || 0
+        "Kasus Pengajuan": i.kasus_pengajuan,
+        "Nominal Pengajuan (Rp)": i.nominal_pengajuan,
+        "Kasus Layak": i.kasus_layak,
+        "Nominal Layak (Rp)": i.nominal_layak,
+        "Kasus Pending": i.kasus_pending,
+        "Nominal Pending (Rp)": i.nominal_pending,
+        "Kasus Tidak Layak": i.kasus_tidak_layak,
+        "Nominal Tidak Layak (Rp)": i.nominal_tidak_layak,
+        "Nominal Pembayaran (Rp)": i.nominal_pembayaran,
+        "Saldo (Rp)": i.saldo
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -773,26 +980,26 @@
 
     // 3. Download PDF
     function downloadPDF() {
-      if (filteredBpjsData.length === 0) return alert('Tidak ada data untuk di-download');
+      if (aggregatedReportData.length === 0) return alert('Tidak ada data untuk di-download');
 
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('l', 'mm', 'a4'); // Orientation Landscape
+      const doc = new jsPDF('l', 'mm', 'a4');
 
       doc.setFontSize(14);
       doc.text("Laporan Klaim BPJS Kesehatan Rumah Sakit", 14, 15);
       doc.setFontSize(9);
       doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 21);
 
-      const tableData = filteredBpjsData.map(i => [
+      const tableData = aggregatedReportData.map(i => [
         `${i.bulan_pelayanan}/${i.tahun_pelayanan}`,
         `${i.kategori_pelayanan} - ${i.jenis_pelayanan}`,
-        i.kasus_pengajuan || 0,
+        i.kasus_pengajuan,
         formatRupiah(i.nominal_pengajuan),
-        i.kasus_layak || 0,
+        i.kasus_layak,
         formatRupiah(i.nominal_layak),
-        i.kasus_pending || 0,
+        i.kasus_pending,
         formatRupiah(i.nominal_pending),
-        i.kasus_tidak_layak || 0,
+        i.kasus_tidak_layak,
         formatRupiah(i.nominal_tidak_layak),
         formatRupiah(i.nominal_pembayaran),
         formatRupiah(i.saldo)
