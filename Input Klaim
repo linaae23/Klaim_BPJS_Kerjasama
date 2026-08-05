@@ -291,8 +291,8 @@
     });
 
     function initSupabase() {
-      const url = document.getElementById('supabaseUrl').value.trim();
-      const key = document.getElementById('supabaseKey').value.trim();
+      const url = document.getElementById('https://nalyzycgxootsioyrfsl.supabase.co').value.trim();
+      const key = document.getElementById('sb_publishable_g0xfBfLedCvBqeRf6D0ecw_PdtwBr1t').value.trim();
 
       if (!url || !key) {
         showAlert('Masukkan Supabase URL dan Anon Key terlebih dahulu!', 'bg-red-100 text-red-700');
