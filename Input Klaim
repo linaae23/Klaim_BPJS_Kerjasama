@@ -284,7 +284,7 @@
       const savedUrl = localStorage.getItem('sp_url');
       const savedKey = localStorage.getItem('sp_key');
       if (savedUrl && savedKey) {
-        document.getElementById('supabaseUrl').value = savedUrl;
+        document.getElementById('sb_publishable_g0xfBfLedCvBqeRf6D0ecw_PdtwBr1t').value = savedUrl;
         document.getElementById('supabaseKey').value = savedKey;
         initSupabase();
       }
