@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Pendapatan & Piutang RS</title>
+  <style>
+    @media print {
+      aside, #btn-show-sidebar, .no-print, button { display: none !important; }
+      main { padding: 0 !important; overflow: visible !important; }
+      body { background: white !important; }
+      .modul-view.hidden { display: none !important; }
+    }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Library untuk Export Excel -->
@@ -39,8 +47,8 @@
       <!-- Menu Navigasi -->
       <nav class="flex-1 p-4 space-y-4 overflow-y-auto text-xs">
         
-        <!-- KELOMPOK INPUT DATA -->
-        <div>
+        <!-- KELOMPOK INPUT DATA (KHUSUS ADMIN) -->
+        <div id="grup-menu-input" data-admin-only="true">
           <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">INPUT DATA</p>
           <div class="space-y-1">
             <button onclick="bukaView('input-pasien')" id="btn-input-pasien" class="w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white font-semibold transition flex items-center gap-2">
@@ -54,8 +62,7 @@
             </button>
           </div>
         </div>
-
-        <hr class="border-slate-800">
+        <hr class="border-slate-800" data-admin-only="true">
 
         <!-- KELOMPOK LAPORAN -->
         <div>
@@ -78,9 +85,16 @@
 
       </nav>
 
-      <!-- Footer Sidebar -->
-      <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
-        &copy; 2026 RS Integrated System
+      <!-- Footer Sidebar: Status Login & Akses -->
+      <div class="p-4 border-t border-slate-800 text-[11px]">
+        <div id="badge-user-info" class="hidden mb-2 text-center text-emerald-400 font-semibold text-[11px] break-all"></div>
+        <button id="btn-login-admin" onclick="bukaModalLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded mb-2 transition">
+          🔐 Login Admin
+        </button>
+        <button id="btn-logout-admin" onclick="logoutAdmin()" class="hidden w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded mb-2 transition">
+          🚪 Logout
+        </button>
+        <div class="text-slate-500 text-center">&copy; 2026 RS Integrated System</div>
       </div>
     </aside>
 
@@ -218,7 +232,7 @@
             <input type="date" id="tagihan_3" class="w-full border p-2 rounded text-xs">
           </div>
           <div class="lg:col-span-2 flex items-end gap-2">
-            <button type="submit" id="btnSubmitPasien" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
+            <button type="submit" id="btnSubmitPasien" data-admin-only="true" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition h-[38px]">
               + Simpan Data Pasien
             </button>
             <button type="button" id="btnBatalPasien" onclick="batalEditPasien()" class="hidden bg-slate-400 text-white font-semibold py-2 px-4 rounded hover:bg-slate-500 transition h-[38px]">
@@ -282,7 +296,7 @@
           </div>
 
           <div>
-            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">
+            <button type="submit" data-admin-only="true" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">
               + Simpan Rekap Pendapatan
             </button>
           </div>
@@ -429,7 +443,7 @@
 
       <div class="col-span-1 md:col-span-3 flex justify-end gap-2 border-t pt-3">
         <button type="reset" onclick="batalEditKerjasama()" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">Reset</button>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700">Simpan Data</button>
+        <button type="submit" data-admin-only="true" class="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700">Simpan Data</button>
       </div>
     </form>
   </div>
@@ -443,9 +457,14 @@
             <h1 class="text-xl font-bold text-slate-800">📋 Laporan Piutang Pasien Perorangan</h1>
             <p class="text-xs text-slate-500">Analisis statistik keuangan pasien, filter periode, dan cetak laporan.</p>
           </div>
-          <button onclick="downloadCSVPasien()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
-            📥 Export Laporan Pasien (CSV)
-          </button>
+          <div class="flex gap-2">
+            <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+              🖨️ Cetak
+            </button>
+            <button onclick="downloadCSVPasien()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+              📥 Export Laporan Pasien (CSV)
+            </button>
+          </div>
         </div>
 
         <!-- STATISTIK PIUTANG PASIEN -->
@@ -548,6 +567,10 @@
           <button onclick="downloadCSVPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
             📥 Export Pendapatan (CSV)
           </button>
+          <!-- Tombol Cetak -->
+  <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
+    🖨️ Cetak
+  </button>
           <!-- Tombol Export Excel -->
   <button onclick="downloadExcelPendapatan()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3 rounded flex items-center gap-1.5 transition shadow-sm">
     <span>📊</span> Export Excel
@@ -663,8 +686,11 @@
       <p class="text-xs text-slate-500">Monitoring piutang perusahaan mitra, status kelunasan, dan ekspor laporan.</p>
     </div>
     <div class="flex gap-2">
-      <button onclick="sinkronkanSemuaRiwayatKerjasama()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+      <button onclick="sinkronkanSemuaRiwayatKerjasama()" data-admin-only="true" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
         🔄 Sinkronkan Riwayat
+      </button>
+      <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+        🖨️ Cetak
       </button>
       <button onclick="exportCSVKerjasama()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
         📥 Export Laporan Kerjasama (CSV)
@@ -821,7 +847,12 @@
 
       <!-- ================= 7. LAPORAN GABUNGAN (KONSOLIDASI) ================= -->
       <section id="view-laporan-gabungan" class="modul-view hidden">
-        <h1 class="text-xl font-bold text-slate-800 mb-1">🌐 Laporan Gabungan & Konsolidasi Keuangan</h1>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-1">
+          <h1 class="text-xl font-bold text-slate-800">🌐 Laporan Gabungan & Konsolidasi Keuangan</h1>
+          <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded flex items-center gap-2 transition shadow-sm">
+            🖨️ Cetak
+          </button>
+        </div>
         <p class="text-xs text-slate-500 mb-6">Ringkasan menyeluruh gabungan Rekap Pendapatan Kerjasama, Piutang Kerjasama, dan Piutang Pasien Perorangan.</p>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-xs">
@@ -911,7 +942,7 @@
           <button type="button" onclick="tutupModalEditPendapatan()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded">
             Batal
           </button>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm">
+          <button type="submit" data-admin-only="true" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm">
             💾 Simpan Perubahan
           </button>
         </div>
@@ -1065,7 +1096,7 @@
               <label class="block font-semibold mb-1">Keterangan</label>
               <textarea id="mek_keterangan" rows="2" class="w-full border p-2 rounded"></textarea>
             </div>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+            <button type="submit" data-admin-only="true" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
               ✔️ Simpan Identitas & Piutang Awal
             </button>
           </div>
@@ -1122,7 +1153,7 @@
         <div class="border-t pt-3">
           <div class="flex justify-between items-center mb-2">
             <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[11px]">📑 Data Detail Piutang</h4>
-            <button type="button" onclick="bukaTambahDetailPiutang()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold py-1.5 px-3 rounded">
+            <button type="button" onclick="bukaTambahDetailPiutang()" data-admin-only="true" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold py-1.5 px-3 rounded">
               + Tambah
             </button>
           </div>
@@ -1197,6 +1228,31 @@
     </div>
   </div>
 
+  <!-- MODAL LOGIN ADMIN -->
+  <div id="modalLogin" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 z-[80]">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
+      <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-sm">🔐 Login Admin</h3>
+        <button onclick="tutupModalLogin()" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+      </div>
+      <form id="formLogin" onsubmit="loginAdmin(event)" class="p-5 space-y-3 text-xs">
+        <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-2 rounded text-[11px]"></div>
+        <div>
+          <label class="block font-semibold mb-1">Email</label>
+          <input type="email" id="login-email" required autocomplete="username" class="w-full border p-2 rounded">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Password</label>
+          <input type="password" id="login-password" required autocomplete="current-password" class="w-full border p-2 rounded">
+        </div>
+        <button type="submit" id="btn-submit-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">
+          Masuk
+        </button>
+        <p class="text-[10px] text-slate-400 text-center">Hanya untuk Admin. Pengguna lain cukup melihat &amp; mencetak laporan tanpa perlu login.</p>
+      </form>
+    </div>
+  </div>
+
   <!-- ================= JAVASCRIPT LOGIC ================= -->
 <script>
     // CREDENTIAL SUPABASE
@@ -1216,6 +1272,145 @@
     // Menyimpan snapshot data lama saat mode edit (untuk hitung selisih riwayat transaksi)
     let pasienDataLama = null;
     let ksDataLama = null;
+
+    // ==========================================
+    // AUTENTIKASI & HAK AKSES (ADMIN vs VIEWER)
+    // Catatan penting: pembatasan tombol di sini HANYA untuk kenyamanan
+    // tampilan. Keamanan sesungguhnya ditentukan oleh Row Level Security
+    // (RLS) di Supabase - pastikan RLS sudah diaktifkan di sisi database,
+    // karena anon key di file ini bisa dipakai siapa pun untuk akses API
+    // langsung tanpa lewat halaman ini sama sekali.
+    // ==========================================
+    let currentUser = null;
+    let currentUserRole = 'guest'; // 'admin' | 'viewer' | 'guest'
+
+    function isAdmin() {
+      return currentUserRole === 'admin';
+    }
+
+    // Dipanggil di setiap fungsi yang mengubah data (simpan/edit/hapus),
+    // sebagai lapisan pengaman tambahan di sisi tampilan.
+    function pastikanAdmin() {
+      if (!isAdmin()) {
+        alert('Aksi ini hanya bisa dilakukan oleh Admin. Silakan login terlebih dahulu.');
+        return false;
+      }
+      return true;
+    }
+
+    async function initAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      await handleAuthChange(session);
+
+      supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+        await handleAuthChange(session);
+      });
+    }
+
+    async function handleAuthChange(session) {
+      currentUser = session?.user || null;
+
+      if (currentUser) {
+        const { data, error } = await supabaseClient
+          .from('user_roles')
+          .select('role, nama')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (!error && data) {
+          currentUserRole = data.role === 'admin' ? 'admin' : 'viewer';
+        } else {
+          // Belum terdaftar di tabel user_roles -> default sebagai viewer (aman)
+          currentUserRole = 'viewer';
+        }
+      } else {
+        currentUserRole = 'guest';
+      }
+
+      terapkanTampilanHakAkses();
+
+      // Muat ulang semua data supaya tombol Edit/Hapus/Tambah di tabel
+      // ikut diperbarui sesuai status login terbaru.
+      if (typeof loadSemuaLaporan === 'function') {
+        loadSemuaLaporan();
+      }
+    }
+
+    function terapkanTampilanHakAkses() {
+      const admin = isAdmin();
+
+      const btnLogin = document.getElementById('btn-login-admin');
+      const btnLogout = document.getElementById('btn-logout-admin');
+      const badgeUser = document.getElementById('badge-user-info');
+
+      if (currentUser) {
+        if (btnLogin) btnLogin.classList.add('hidden');
+        if (btnLogout) btnLogout.classList.remove('hidden');
+        if (badgeUser) {
+          badgeUser.classList.remove('hidden');
+          badgeUser.innerText = admin ? `👤 Admin: ${currentUser.email}` : `👁️ Viewer: ${currentUser.email}`;
+        }
+      } else {
+        if (btnLogin) btnLogin.classList.remove('hidden');
+        if (btnLogout) btnLogout.classList.add('hidden');
+        if (badgeUser) badgeUser.classList.add('hidden');
+      }
+
+      document.querySelectorAll('[data-admin-only]').forEach(el => {
+        el.style.display = admin ? '' : 'none';
+      });
+
+      // Jika sedang membuka salah satu halaman Input Data tapi bukan admin,
+      // otomatis alihkan ke Laporan Gabungan supaya tidak "nyangkut" di form kosong.
+      if (!admin) {
+        const viewAktif = document.querySelector('.modul-view:not(.hidden)');
+        if (viewAktif && viewAktif.id.startsWith('view-input')) {
+          bukaView('laporan-gabungan');
+        }
+      }
+    }
+
+    function bukaModalLogin() {
+      document.getElementById('login-error').classList.add('hidden');
+      document.getElementById('formLogin').reset();
+      const modal = document.getElementById('modalLogin');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function tutupModalLogin() {
+      const modal = document.getElementById('modalLogin');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function loginAdmin(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const btnSubmit = document.getElementById('btn-submit-login');
+      const elError = document.getElementById('login-error');
+
+      elError.classList.add('hidden');
+      if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.innerText = 'Memproses...'; }
+
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'Masuk'; }
+
+      if (error) {
+        elError.innerText = 'Login gagal: ' + error.message;
+        elError.classList.remove('hidden');
+        return;
+      }
+
+      tutupModalLogin();
+    }
+
+    async function logoutAdmin() {
+      await supabaseClient.auth.signOut();
+    }
 
     // NAVIGASI VIEW
     function bukaView(viewName) {
@@ -1386,8 +1581,10 @@ function renderTabelPasien(data) {
         <td class="p-2.5 text-center font-sans">
           <div class="flex items-center justify-center gap-1">
             <button onclick="bukaRiwayatPasien('${item.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-2 py-1 rounded">Riwayat</button>
+            ${isAdmin() ? `
             <button onclick="editPasien('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[10px] px-2 py-1 rounded">Edit</button>
             <button onclick="hapusPasien('${item.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded">Hapus</button>
+            ` : ''}
           </div>
         </td>
       </tr>
@@ -1515,6 +1712,7 @@ function editPasien(id) {
 }
 
 async function hapusPasien(id) {
+  if (!pastikanAdmin()) return;
   if (!confirm('Apakah Anda yakin ingin menghapus data pasien ini?')) return;
 
   const { error } = await supabaseClient
@@ -1638,6 +1836,7 @@ const formPasien = document.getElementById('formPiutangPasien');
 if (formPasien) {
   formPasien.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!pastikanAdmin()) return;
 
     const id = document.getElementById('edit_id').value;
     const payload = {
@@ -1993,9 +2192,11 @@ if (formPasien) {
               Rp ${sisa.toLocaleString('id-ID')}
             </td>
             <td class="p-2.5 text-center font-sans">
+              ${isAdmin() ? `
               <button type="button" onclick="bukaModalEditPendapatanByKode('${i.kode_rekening}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold py-1 px-2.5 rounded transition shadow-sm">
                 ✏️ Edit
               </button>
+              ` : '-'}
             </td>
           </tr>
         `;
@@ -2093,6 +2294,7 @@ if (formPasien) {
 
     async function simpanPerubahanPendapatan(e) {
       e.preventDefault();
+      if (!pastikanAdmin()) return;
 
       const id = document.getElementById('edit_id').value;
       const kodeRekening = document.getElementById('edit_kode_rekening').value;
@@ -2418,7 +2620,7 @@ if (formPasien) {
                     <td class="p-3" onclick="event.stopPropagation()">
                         <div class="flex gap-1">
                             <button onclick="bukaModalEditKerjasama('${row.id}')" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[10px]">Detail</button>
-                            <button onclick="deletePiutangKerjasama('${row.id}')" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>
+                            ${isAdmin() ? `<button onclick="deletePiutangKerjasama('${row.id}')" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]">Hapus</button>` : ''}
                         </div>
                     </td>
                 </tr>
@@ -2512,6 +2714,7 @@ if (formPasien) {
     // (data lama sebelum fitur Data Detail Piutang dibuat).
     // ==========================================
     async function sinkronkanSemuaRiwayatKerjasama() {
+      if (!pastikanAdmin()) return;
       if (!confirm('Proses ini akan memeriksa SEMUA data piutang kerjasama dan menambahkan baris Data Detail Piutang (Piutang Awal, Koreksi, Bayar, Transfer) yang belum tercatat di riwayat. Data yang sudah lengkap tidak akan diduplikasi. Lanjutkan?')) return;
 
       const { data: semuaPiutang, error: errPiutang } = await supabaseClient
@@ -2635,6 +2838,7 @@ if (formPasien) {
     }
 
     async function deletePiutangKerjasama(id) {
+      if (!pastikanAdmin()) return;
       if (!confirm('Apakah Anda yakin ingin menghapus data piutang kerja sama ini?')) return;
 
       const { error } = await supabaseClient
@@ -2652,6 +2856,7 @@ if (formPasien) {
 
     async function simpanPiutangKerjasama(e) {
       e.preventDefault(); // Wajib agar halaman tidak refresh otomatis
+      if (!pastikanAdmin()) return;
 
       const editId = document.getElementById('ks-edit-id').value;
 
@@ -2885,8 +3090,10 @@ if (formPasien) {
             <td class="p-2 border-r text-right font-semibold whitespace-nowrap ${warnaJenisRiwayat(r.jenis_transaksi)}">Rp ${nominal.toLocaleString('id-ID')}</td>
             <td class="p-2 text-center">
               <div class="flex items-center justify-center gap-1">
+                ${isAdmin() ? `
                 <button type="button" onclick="bukaEditDetailPiutang('${r.id}')" class="bg-amber-500 hover:bg-amber-600 text-white text-[10px] px-2 py-1 rounded">Edit</button>
                 <button type="button" onclick="hapusDetailPiutang('${r.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded">Hapus</button>
+                ` : '<span class="text-slate-300">-</span>'}
               </div>
             </td>
           </tr>
@@ -2931,6 +3138,7 @@ if (formPasien) {
     // Simpan perubahan identitas piutang + piutang awal
     async function simpanEditKerjasamaIdentitas(e) {
       e.preventDefault();
+      if (!pastikanAdmin()) return;
 
       const id = document.getElementById('mek-id').value;
       if (!id) return;
@@ -3060,6 +3268,7 @@ if (formPasien) {
 
     async function simpanDetailPiutang(e) {
       e.preventDefault();
+      if (!pastikanAdmin()) return;
 
       const riwayatId = document.getElementById('mdp-riwayat-id').value;
       const kerjasamaId = document.getElementById('mdp-kerjasama-id').value;
@@ -3091,6 +3300,7 @@ if (formPasien) {
     }
 
     async function hapusDetailPiutang(riwayatId) {
+      if (!pastikanAdmin()) return;
       if (!confirm('Hapus data mutasi ini? Saldo akan dihitung ulang otomatis.')) return;
 
       const kerjasamaId = document.getElementById('mek-id').value;
@@ -3226,7 +3436,10 @@ if (formPasien) {
       const elSelesai = document.getElementById('p_filter_bulan_selesai');
       if (elSelesai) elSelesai.value = "11";
 
-      loadSemuaLaporan();
+      // Inisialisasi status login lebih dulu -> baru muat data laporan
+      // (handleAuthChange di dalam initAuth() akan memanggil loadSemuaLaporan()
+      // begitu status login diketahui, jadi tidak perlu panggil loadSemuaLaporan() di sini lagi)
+      initAuth();
     });
   
   
